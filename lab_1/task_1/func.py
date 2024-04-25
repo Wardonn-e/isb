@@ -1,7 +1,7 @@
 from typing import Dict
 from json import dump, load, JSONDecodeError
 from random import shuffle
-from constants import ALPHABET
+from constants import alphabet
 
 
 def write_to_file(filename: str, text: str) -> None:
@@ -91,9 +91,9 @@ def generate_substitution() -> dict[str, str]:
     Returns:
         Dict[str, str]: Mapping to substituted characters.
     """
-    alphabet = list(ALPHABET)
-    shuffle(alphabet)
-    mapping: Dict[str, str] = {char: alphabet[i] for i, char in enumerate(ALPHABET)}
+    alphabet_list = list(alphabet)
+    shuffle(alphabet_list)
+    mapping: Dict[str, str] = {char: alphabet_list[i] for i, char in enumerate(alphabet)}
     return mapping
 
 

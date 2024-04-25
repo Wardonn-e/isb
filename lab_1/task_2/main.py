@@ -1,11 +1,9 @@
-from func import *
-from constants import path_to_json_paths
-
+from func import read_json_from_file, read_from_file, analyze_text, decode_text, write_to_file
+from constants import input_path, output_path, substitution_path
 
 if __name__ == "__main__":
-    path = read_json_from_file(path_to_json_paths)
-    input_text = read_from_file(path["input"])
+    input_text = read_from_file(input_path)
     analyze_text(input_text)
-    substitution = read_json_from_file(path["substitution"])
+    substitution = read_json_from_file(substitution_path)
     output_text = decode_text(input_text, substitution)
-    write_to_file(path["output"], output_text)
+    write_to_file(output_path, output_text)
