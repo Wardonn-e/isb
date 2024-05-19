@@ -1,4 +1,4 @@
-alphabet = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
-path_input = "input.txt"
-path_output = "output.txt"
-path_substitution = "monoalphabetic_substitution.json"
+ALPHABET = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+PATH_INPUT = "input.txt"
+PATH_OUTPUT = "output.txt"
+PATH_SUBSTITUTION = "monoalphabetic_substitution.json"
