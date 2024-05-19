@@ -1,8 +1,19 @@
 import math
 from scipy.special import gammaincc
+
 from constants import PI, SEQUENCE_CPP_PATH, SEQUENCE_JAVA_PATH, BLOCK_SIZE
 
+
 def read_sequence_from_file(filename: str) -> str:
+    """
+    Reads a binary data from a file.
+
+    Args:
+        filename (str): The name of file.
+
+    Returns:
+        str: The binary sequence.
+    """
     try:
         with open(filename, 'r') as file:
             sequence = file.read().strip()
@@ -12,20 +23,40 @@ def read_sequence_from_file(filename: str) -> str:
     except IOError:
         raise IOError(f"An error occurred while reading the file {filename}.")
 
+
 def frequency_bit_test(sequence: str) -> float:
+    """
+    Frequency test on a binary sequence.
+
+    Args:
+        sequence (str): The binary sequence.
+
+    Returns:
+        float: The p-value of the test.
+    """
     sequence_length = len(sequence)
     sum_bits = sum(1 if bit == '1' else -1 for bit in sequence)
     s_obs = abs(sum_bits) / math.sqrt(sequence_length)
     p_value = math.erfc(s_obs / math.sqrt(2))
     return p_value
 
+
 def same_consecutive_bits_test(sequence: str) -> float:
+    """
+    Performs the Runs Test on a binary sequence.
+
+    Args:
+        sequence (str): The binary sequence as a string.
+
+    Returns:
+        float: The p-value of the test.
+    """
     sequence_length = len(sequence)
     proportion_ones = sequence.count('1') / sequence_length
     tau = 2 / math.sqrt(sequence_length)
 
     if abs(proportion_ones - 0.5) >= tau:
-        return 0.0
+        return 0.0  # The sequence fails the test
 
     number_of_runs = 1
     for i in range(1, sequence_length):
@@ -37,7 +68,17 @@ def same_consecutive_bits_test(sequence: str) -> float:
     p_value = math.erfc(abs(number_of_runs - expected_runs) / variance)
     return p_value
 
+
 def longest_run_of_ones_test(sequence: str) -> float:
+    """
+    Longest Run of Ones in Block Test on a binary sequence.
+
+    Args:
+        sequence (str): The binary sequence.
+
+    Returns:
+        float: The p-value of the test.
+    """
     sequence_length = len(sequence)
     pi = PI
 
@@ -55,7 +96,15 @@ def longest_run_of_ones_test(sequence: str) -> float:
     p_value = gammaincc(3 / 2, chi_squared / 2)
     return p_value
 
+
 def perform_tests_on_sequence(sequence: str, source: str):
+    """
+    Runs all three NIST tests on a binary sequence and prints results.
+
+    Args:
+        sequence (str): Binary sequence as a string.
+        source (str): Source of the sequence.
+    """
     print(f"Result for {source}:")
 
     print("Frequency Bit Test:")
@@ -71,6 +120,7 @@ def perform_tests_on_sequence(sequence: str, source: str):
     print(f"P-value: {p_value}")
 
     print("\n" + "-" * 40 + "\n")
+
 
 if __name__ == "__main__":
     sequence_cpp = read_sequence_from_file(SEQUENCE_CPP_PATH)
