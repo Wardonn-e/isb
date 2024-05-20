@@ -1,11 +1,11 @@
 import os
-
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
+import base64
 
 
 class AES:
-    def __init__(self, key: bytes):
+    def __init__(self, key: bytes) -> None:
         self.key = key
 
     @staticmethod
@@ -16,20 +16,31 @@ class AES:
         key = os.urandom(key_length_bytes)
         return key
 
-    def encrypt(self, text: str) -> bytes:
-        iv = os.urandom(16)  # Initialization vector
+    @staticmethod
+    def save_key(key: bytes, file_path: str) -> None:
+        with open(file_path, 'wb') as key_file:
+            key_file.write(base64.b64encode(key))
+
+    @staticmethod
+    def load_key(file_path: str) -> bytes:
+        with open(file_path, 'rb') as key_file:
+            key = base64.b64decode(key_file.read())
+        return key
+
+    def encrypt(self, data: bytes) -> bytes:
+        iv = os.urandom(16)
         cipher = Cipher(algorithms.AES(self.key), modes.CBC(iv))
         encryptor = cipher.encryptor()
         padder = padding.PKCS7(algorithms.AES.block_size).padder()
 
-        padded_data = padder.update(text.encode()) + padder.finalize()
+        padded_data = padder.update(data) + padder.finalize()
         ciphertext = encryptor.update(padded_data) + encryptor.finalize()
 
         return iv + ciphertext
 
-    def decrypt(self, text: bytes) -> str:
-        iv = text[:16]
-        actual_ciphertext = text[16:]
+    def decrypt(self, data: bytes) -> bytes:
+        iv = data[:16]
+        actual_ciphertext = data[16:]
         cipher = Cipher(algorithms.AES(self.key), modes.CBC(iv))
         decryptor = cipher.decryptor()
         unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
@@ -37,16 +48,4 @@ class AES:
         decrypted_padded_data = decryptor.update(actual_ciphertext) + decryptor.finalize()
         plaintext = unpadder.update(decrypted_padded_data) + unpadder.finalize()
 
-        return plaintext.decode()
-
-
-key = AES.generate_key(192)
-print(key)
-cipher = AES(key)
-
-original_text = "Бубубубубубу"
-encrypted = cipher.encrypt(original_text)
-print("Зашифрованный текст:", encrypted)
-
-decrypted = cipher.decrypt(encrypted)
-print("Расшифрованный текст:", decrypted)
+        return plaintext
