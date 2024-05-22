@@ -1,8 +1,8 @@
 {
-    "initial_file": "texts/war_and_peace.ru.txt",
-    "encrypted_file": "path/to/encrypted/file.txt",
-    "decrypted_file": "path/to/decrypted/file.txt",
-    "symmetric_key": "path/to/symmetric/key.txt",
-    "public_key": "path/to/public/key.pem",
-    "private_key": "path/to/secret/key.pem"
+    "initial_file": "texts/war_and_peace_ru.txt",
+    "encrypted_file": "texts/war_and_peace_ru_encrypted.txt",
+    "decrypted_file": "texts/war_and_peace_ru_decrypted.txt",
+    "symmetric_key": "keys/symmetric_key.txt",
+    "public_key": "keys/public_key.pem",
+    "private_key": "keys/private_key.pem"
 }
