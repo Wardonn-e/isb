@@ -5,14 +5,21 @@ from symmetric_cipher import AES
 from file_manager import File
 
 
-def main():
+def main() -> None:
+    """
+    Main function to execute the encryption/decryption process.
+    """
     parser = argparse.ArgumentParser(description="Encrypt/decrypt text using RSA and AES algorithms.")
-    parser.add_argument("mode", choices=["key_gen", "encryption", "decryption"], help="Operation mode: key_gen, encryption, decryption.")
+    parser.add_argument("mode", choices=["key_gen", "encryption", "decryption"],
+                        help="Operation mode: key_gen, encryption, decryption.")
     args = parser.parse_args()
 
     settings = File.read_json("settings.json")
 
-    def key_gen():
+    def key_gen()-> None:
+        """
+        Generates RSA key pair and AES symmetric key, and saves them to designated files.
+        """
         symmetric_key = AES.generate_key(192)
         private_key, public_key = RSA.generate_key_pair()
 
@@ -23,7 +30,9 @@ def main():
         print("keys were generated")
 
     def encryption():
-        # Text encryption
+        """
+        Encrypts text file using RSA and AES algorithms.
+        """
         initial_text = File.read_bytes(settings["initial_file"])
         symmetric_key_encrypted = File.read_bytes(settings["symmetric_key"])
         private_key = RSA.load_private_key(settings["private_key"])
@@ -35,6 +44,9 @@ def main():
         print("text encrypted")
 
     def decryption():
+        """
+        Decrypts encrypted text file using RSA and AES algorithms.
+        """
         encrypted_text = File.read_bytes(settings["encrypted_file"])
         symmetric_key_encrypted = File.read_bytes(settings["symmetric_key"])
         private_key = RSA.load_private_key(settings["private_key"])
