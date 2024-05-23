@@ -1,12 +1,12 @@
 import os
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
-import base64
-
-from file_manager import File
 
 
 class AES:
+    """
+    Class representing AES encryption and decryption operations.
+    """
     def __init__(self) -> None:
         pass
 
@@ -26,30 +26,6 @@ class AES:
         key_length_bytes = key_length // 8
         key = os.urandom(key_length_bytes)
         return key
-
-    @staticmethod
-    def save_key(key: bytes, file_path: str) -> None:
-        """
-        Saves the AES key to a file.
-
-        Args:
-            key (bytes): The AES key to save.
-            file_path (str): The file path to save the key.
-        """
-        File.write_bytes(file_path, key)
-
-    @staticmethod
-    def load_key(file_path: str) -> bytes:
-        """
-        Loads the AES key from a file.
-
-        Args:
-            file_path (str): The file path to load the key from.
-
-        Returns:
-            bytes: The loaded AES key.
-        """
-        return base64.b64decode(File.read_bytes(file_path))
 
     @staticmethod
     def encrypt(key: bytes, data: bytes) -> bytes:
