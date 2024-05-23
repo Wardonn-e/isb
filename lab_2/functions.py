@@ -1,5 +1,6 @@
 import math
-from scipy.special import gammaincc
+
+from scipy.special import gammainc
 
 from constants import PI, SEQUENCE_CPP_PATH, SEQUENCE_JAVA_PATH, BLOCK_SIZE
 
@@ -20,8 +21,8 @@ def read_sequence_from_file(filename: str) -> str:
         return sequence
     except FileNotFoundError:
         raise FileNotFoundError(f"File {filename} does not exist.")
-    except IOError:
-        raise IOError(f"An error occurred while reading the file {filename}.")
+    except Exception as e:
+        raise Exception(f"An error occurred while reading the file: {e}")
 
 
 def frequency_bit_test(sequence: str) -> float:
@@ -53,20 +54,18 @@ def same_consecutive_bits_test(sequence: str) -> float:
     """
     sequence_length = len(sequence)
     proportion_ones = sequence.count('1') / sequence_length
-    tau = 2 / math.sqrt(sequence_length)
+    tau = 2 / math.sqrt(len(str(proportion_ones)))
 
-    if abs(proportion_ones - 0.5) >= tau:
-        return 0.0  # The sequence fails the test
+    if abs(proportion_ones-0.5) < tau:
+        count = 0
+        for i in range(len(sequence) - 1):
+            if not (sequence[i] == sequence[i+1]):
+                count += 1
 
-    number_of_runs = 1
-    for i in range(1, sequence_length):
-        if sequence[i] != sequence[i - 1]:
-            number_of_runs += 1
+        return math.erfc(abs(count - 2 * len(sequence) * proportion_ones * (1 - proportion_ones))
+                         / (2 * math.sqrt(2 * len(sequence)) * proportion_ones * (1 - proportion_ones)))
+    return 0
 
-    expected_runs = 2 * sequence_length * proportion_ones * (1 - proportion_ones)
-    variance = 2 * math.sqrt(2 * sequence_length) * proportion_ones * (1 - proportion_ones)
-    p_value = math.erfc(abs(number_of_runs - expected_runs) / variance)
-    return p_value
 
 
 def longest_run_of_ones_test(sequence: str) -> float:
@@ -79,22 +78,30 @@ def longest_run_of_ones_test(sequence: str) -> float:
     Returns:
         float: The p-value of the test.
     """
-    sequence_length = len(sequence)
-    pi = PI
+    num_blocks = len(sequence) // BLOCK_SIZE
+    binary_blocks = [sequence[i * 8:(i + 1) * 8] for i in range(num_blocks)]
 
-    number_of_blocks = sequence_length // BLOCK_SIZE
-    max_ones_in_block = [0] * BLOCK_SIZE
+    max_ones_per_block = []
+    for block in binary_blocks:
+        max_ones = 0
+        current_ones = 0
+        for bit in block:
+            if bit == "1":
+                current_ones += 1
+            else:
+                max_ones = max(current_ones, max_ones)
+                current_ones = 0
+        max_ones_per_block.append(max(current_ones, max_ones))
 
-    for i in range(number_of_blocks):
-        block = sequence[i * BLOCK_SIZE:(i + 1) * BLOCK_SIZE]
-        max_run = max(len(run) for run in block.split('0'))
-        max_ones_in_block[max_run] += 1
+    frequency = [0, 0, 0, 0]
+    frequency[0] = max_ones_per_block.count(0) + max_ones_per_block.count(1)
+    frequency[1] = max_ones_per_block.count(2)
+    frequency[2] = max_ones_per_block.count(3)
+    frequency[3] = len(max_ones_per_block) - frequency[0] - frequency[1] - frequency[2]
 
-    chi_squared = sum(
-        [(max_ones_in_block[i] - number_of_blocks * pi[i]) ** 2 / (number_of_blocks * pi[i]) for i in range(3)]
-    )
-    p_value = gammaincc(3 / 2, chi_squared / 2)
-    return p_value
+    chi_square_stat = sum((frequency[i] - 16 * PI[i]) ** 2 / (16 * PI[i]) for i in range(len(frequency)))
+
+    return gammainc(3 / 2, chi_square_stat / 2)
 
 
 def perform_tests_on_sequence(sequence: str, source: str):
