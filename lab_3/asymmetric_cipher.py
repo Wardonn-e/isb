@@ -1,8 +1,6 @@
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import hashes
 
-from file_manager import File
-
 
 class RSA:
     """
